@@ -36,10 +36,22 @@
       true,
       {
         "order": [
-          "static-field",
-          "instance-field",
-          "static-method",
-          "instance-method"
+          "public-static-field",
+          "protected-static-field",
+          "public-instance-field",
+          "protected-instance-field",
+
+          "constructor",
+
+          "public-static-method",
+          "protected-static-method",
+          "public-instance-method",
+          "protected-instance-method",
+
+          "private-static-method",
+          "private-instance-method",
+          "private-static-field",
+          "private-instance-field"
         ]
       }
     ],
@@ -71,7 +83,7 @@
     ],
     "semicolon": {
       "options": [
-        "always"
+        "never"
       ]
     },
     "space-before-function-paren": {

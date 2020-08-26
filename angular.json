@@ -2,5 +2,68 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "newProjectRoot": "projects",
-  "projects": {}
+  "projects": {
+    "@vixncu/ngx-formx": {
+      "projectType": "library",
+      "root": "projects/vixncu/ngx-formx",
+      "sourceRoot": "projects/vixncu/ngx-formx/src",
+      "prefix": "fmx",
+      "schematics": {
+        "@schematics/angular:component": {
+          "skipTests": true,
+          "changeDetection": "OnPush",
+          "flat": true,
+          "inlineStyle": true,
+          "inlineTemplate": true
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/vixncu/ngx-formx/tsconfig.lib.json",
+            "project": "projects/vixncu/ngx-formx/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/vixncu/ngx-formx/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/vixncu/ngx-formx/src/test.ts",
+            "tsConfig": "projects/vixncu/ngx-formx/tsconfig.spec.json",
+            "karmaConfig": "projects/vixncu/ngx-formx/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/vixncu/ngx-formx/tsconfig.lib.json",
+              "projects/vixncu/ngx-formx/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": "e297ea76-22b6-43ec-b9b5-efaacf88409e"
+  },
+  "defaultProject": "@vixncu/ngx-formx"
 }
