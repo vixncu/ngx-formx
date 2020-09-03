@@ -25,7 +25,6 @@ export abstract class ControlValueAccessor<I = unknown, O = I> implements NgCont
 
   externalControl!: AbstractControl
   externalErrors$!: Observable<ValidationErrors | null>
-
   protected onTouched!: () => void
   protected readonly destroyed$: Subject<void> = new Subject()
 
@@ -33,8 +32,12 @@ export abstract class ControlValueAccessor<I = unknown, O = I> implements NgCont
     ngControl.valueAccessor = this
   }
 
+  get destroyed(): boolean {
+    return this.isDestroyed
+  }
+
   writeValue(value: I): void {
-    this.control.patchValue(value)
+    this.control.reset(value)
   }
 
   registerOnChange(fn: (value: O) => void): void {
@@ -56,6 +59,7 @@ export abstract class ControlValueAccessor<I = unknown, O = I> implements NgCont
   }
 
   ngOnDestroy(): void {
+    this.isDestroyed = true
     this.destroyed$.next()
   }
 
@@ -75,6 +79,16 @@ export abstract class ControlValueAccessor<I = unknown, O = I> implements NgCont
 
   protected validatorFn(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
+      if (this.destroyed) {
+        /** If this control is destroyed, but the ${@link externalControl} is not, the validators set by {@link registerExternalValidators}
+         * will remain active. So by returning null when this control is destroyed it will not continue to affect
+         * {@link externalControl}s validation status.
+         *
+         * This is a workaround until Angular provides a way to remove a specific validator.
+         * Right now, on version 10.0.11, all validators are composed under one validation function.
+         */
+        return null
+      }
       if (this.control.invalid) {
         return this.control.errors ?? { invalid: true }
       }
@@ -85,7 +99,8 @@ export abstract class ControlValueAccessor<I = unknown, O = I> implements NgCont
   protected asyncValidatorFn(): AsyncValidatorFn {
     return (control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
       return this.control.statusChanges.pipe(
-        startWith(this.control.status),
+        /** @see validatorFn explanation regarding the use of {@link destroyed} in the validation logic */
+        startWith(!this.destroyed ? this.control.status : 'ACTIVE'),
         filter(status => status !== 'PENDING'), // if async validation does not emit a value it's recalled until it does
         map(status => status === 'INVALID' ? (this.control.errors ?? { invalid: true }) : null),
         first()
@@ -106,4 +121,6 @@ export abstract class ControlValueAccessor<I = unknown, O = I> implements NgCont
   protected getErrors$(control: AbstractControl): Observable<ValidationErrors | null> {
     return FmxFormUtils.getControlErrors$(control).pipe(takeUntil(this.destroyed$), share())
   }
+
+  private isDestroyed: boolean = false
 }
