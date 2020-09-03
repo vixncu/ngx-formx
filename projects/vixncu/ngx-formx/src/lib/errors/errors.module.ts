@@ -23,7 +23,7 @@ export interface FmxErrorsModuleConfig {
   ]
 })
 export class FmxErrorsModule {
-  static forRoot(config?: FmxErrorsModuleConfig): ModuleWithProviders<FmxErrorsModule> {
+  static forRoot(): ModuleWithProviders<FmxErrorsModule> {
     return {
       ngModule: FmxErrorsModule,
       providers: [

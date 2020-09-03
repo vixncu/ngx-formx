@@ -1,6 +1,6 @@
 {
   "name": "@vixncu/ngx-formx",
-  "version": "10.0.0",
+  "version": "10.0.3",
   "description": "A collection of extensions for @angular/forms",
   "keywords": [
     "angular",
